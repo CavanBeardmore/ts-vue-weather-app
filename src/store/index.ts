@@ -8,7 +8,14 @@ export default createStore({
   mutations: {
   },
   actions: {
+    getCurrentData() {
+      
+    },
+    getForecastedData() {
+
+    }
   },
   modules: {
   }
 })
+//
