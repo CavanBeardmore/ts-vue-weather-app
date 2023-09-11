@@ -1,6 +1,5 @@
 export let formatCurrent = (urlOne: string, location: string, urlTwo: string) => {
     const newUrl = urlOne + location + urlTwo
-    console.log(newUrl);
     return newUrl
 };
 

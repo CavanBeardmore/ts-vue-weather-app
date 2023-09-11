@@ -1,109 +1,133 @@
 <template>
+<div class="wrapper">
+  <div class="controls">
+    <h1>Weather App</h1>
+    <form>
+      <div class="user-input">
+        <label for="weatherInput" class="w-label">Get weather data:</label>
+        <input name="weatherInput" type="text" placeholder="London" v-model="locationInput" class="w-input">
+      </div>
+      
+      <div class="days-input">
+        <p class="d-label">Amount of forecasted days:</p>
+        <button @click="decrement(daysInput)" type='button' :disabled="!decrementBool" class="d-button">-</button>
+        <h4 class="days">{{daysInput}}</h4>
+        <button @click="increment(daysInput)" type='button' :disabled="!incrementBool" class="d-button">+</button>
+      </div>
 
-  <h1>Weather App</h1>
+      <div class="input-buttons">
+        <button 
+          type="button" 
+          @click="getCurrent(locationInput)" 
+          :disabled="!locationInput" 
+          class="i-button"
+        > Get current weather </button>
+        <button 
+          type="button" 
+          @click="getForecast(locationInput, daysInput)" 
+          :disabled="!locationInput" 
+          class="i-button"
+          > Get forecasted weather </button>
+      </div>
+    </form>
 
-  <form>
-    <div class="user-input">
-      <label for="weatherInput" class="w-label">Get weather data:</label>
-      <input name="weatherInput" type="text" placeholder="London" v-model="locationInput" class="w-input">
+    <div v-if="forecastedData || currentData"> 
+      <button @click="toggle('temp', 'f')" v-show="temperature === 'c'" class="toggle-button"> Show in Fahrenheit </button>
+      <button @click="toggle('temp', 'c')" v-show="temperature === 'f'" class="toggle-button"> Show in Celsius </button>
+      <button @click="toggle('wind', 'k')" v-show="wind === 'm' && moreCurrent" class="toggle-button"> Show in Kilometers </button>
+      <button @click="toggle('wind', 'm')" v-show="wind === 'k' && moreCurrent" class="toggle-button"> Show in Miles </button>
+      <button @click="toggle('precip', 'mm')" v-show="precip === 'in' && moreCurrent" class="toggle-button"> Show in Millimeters </button>
+      <button @click="toggle('precip', 'in')" v-show="precip === 'mm' && moreCurrent" class="toggle-button"> Show in Inches </button>
     </div>
-    
-    <div class="days-input">
-      <p class="d-label">Amount of forecasted days:</p>
-      <button @click="decrement(daysInput)" type='button' :disabled="!decrementBool" class="d-button">-</button>
-      <h4 class="days">{{daysInput}}</h4>
-      <button @click="increment(daysInput)" type='button' :disabled="!incrementBool" class="d-button">+</button>
-    </div>
 
-    <div class="input-buttons">
-      <button 
-        type="button" 
-        @click="getCurrent(locationInput)" 
-        :disabled="!locationInput" 
-        class="i-button"
-      > Get current weather </button>
-      <button 
-        type="button" 
-        @click="getForecast(locationInput, daysInput)" 
-        :disabled="!locationInput" 
-        class="i-button"
-        > Get forecasted weather </button>
-    </div>
-  </form>
-
-  <div v-if="forecastedData || currentData"> 
-    <button @click="toggle('temp', 'f')" v-show="temperature === 'c'" class="toggle-button"> Show in Fahrenheit </button>
-    <button @click="toggle('temp', 'c')" v-show="temperature === 'f'" class="toggle-button"> Show in Celsius </button>
-    <button @click="toggle('wind', 'k')" v-show="wind === 'm'" class="toggle-button"> Show in KPH </button>
-    <button @click="toggle('wind', 'm')" v-show="wind === 'k'" class="toggle-button"> Show in MPH </button>
+    <!-- Errors -->
+    <p style="color: darkred">{{inputError}}</p>
+    <h4 style="color: darkred" v-if="requestError">{{requestError}}</h4>
   </div>
 
-  <!-- Errors -->
-  <p style="color: darkred">{{inputError}}</p>
-  <h4 style="color: darkred" v-if="requestError">{{requestError}}</h4>
-
+  <div class="weatherdata">
   <!-- current weather data -->
-  <div class="current" v-if="currentData">
-    <h3>Current Weather:</h3>
-    <h4>{{currentData.location.name}}</h4>
-    <table class="current-list">
-      <tr>
-        <th>Condition:</th>
-        <th>Time:</th>
-        <th>Temp:</th>
-      </tr>
-      <tr>
-        <td><img :src="currentData.current.condition.icon"></td>
-        <td>{{formattedTime}}</td>
-        <td v-show="temperature === 'c'">{{currentData.current.temp_c}} °C</td>
-        <td v-show="temperature === 'f'">{{currentData.current.temp_f}} °F</td>
-      </tr>
-    </table>
-    <button @click="toggleMoreCurrent" class="button">More Information</button>
-    <div class="more-current">    
-      <table v-if="moreCurrent">
+    <div class="current" v-if="currentData">
+      <h2>Current Weather:</h2>
+      <h3>{{currentData.location.name}}</h3>
+      <table>
         <tr>
           <th>Condition:</th>
           <th>Time:</th>
           <th>Temp:</th>
-          <th>Wind Speed:</th>
-          <th>Wind Direction</th>
+          <th v-if="moreCurrent">Wind Speed:</th>
+          <th v-if="moreCurrent">Wind Direction:</th>
+          <th v-if="moreCurrent">Humidity:</th>
+          <th v-if="moreCurrent">Precipitation:</th>
+          <th v-if="moreCurrent">Cloud Coverage:</th>
+          <th v-if="moreCurrent">UV:</th>
+          <th v-if="moreCurrent">Feels Like:</th>
+          <th v-if="moreCurrent">Visibility:</th>
         </tr>
         <tr>
           <td><img :src="currentData.current.condition.icon"></td>
           <td>{{formattedTime}}</td>
           <td v-show="temperature === 'c'">{{currentData.current.temp_c}} °C</td>
           <td v-show="temperature === 'f'">{{currentData.current.temp_f}} °F</td>
-          <td v-show="wind === 'm'">{{currentData.current.wind_mph}} MPH</td>
-          <td v-show="wind === 'k'">{{currentData.current.wind_kph}} KPH</td>
-          <td>{{currentData.current.wind_dir}}</td>
+          <td v-if="moreCurrent" v-show="wind === 'm'">{{currentData.current.wind_mph}} MPH</td>
+          <td v-if="moreCurrent" v-show="wind === 'k'">{{currentData.current.wind_kph}} KPH</td>
+          <td v-if="moreCurrent">{{currentData.current.wind_dir}}</td>
+          <td v-if="moreCurrent">{{currentData.current.humidity}}%</td>
+          <td v-if="moreCurrent" v-show="precip === 'in'">{{currentData.current.precip_in}} inches</td>
+          <td v-if="moreCurrent" v-show="precip === 'mm'">{{currentData.current.precip_mm}} mm</td>
+          <td v-if="moreCurrent">{{currentData.current.cloud}}%</td>
+          <td v-if="moreCurrent">{{currentData.current.uv}}</td>
+          <td v-if="moreCurrent" v-show="temperature === 'c'" class="feels-like">{{currentData.current.feelslike_c}} °C</td>
+          <td v-if="moreCurrent" v-show="temperature === 'f'" class="feels-like">{{currentData.current.feelslike_f}} °F</td>
+          <td v-if="moreCurrent" v-show="wind === 'm'">{{currentData.current.vis_miles}} miles</td>
+          <td v-if="moreCurrent" v-show="wind === 'k'">{{currentData.current.vis_km}} km</td>
         </tr>
       </table>
+      <button @click="toggleMoreCurrent" class="button">Show More Information</button> 
+    </div>
+    <!-- forecasted weather data -->
+    <div class="forecast" v-if="forecastedData">
+      <h2>Forecasted Weather:</h2>
+      <h3>{{forecastedData.location.name}}</h3>
+      <div class="forecast-controls">
+        <button @click="toggleMoreForecast" class="button">Show More Information</button> 
+        <button @click="toggle4Hourly" class="button">Show Four Hourly Data</button>
+      </div>
+      <div v-for="day in forecastedData.forecast.forecastday" :key="day" class="forecast-day">
+        <h4>{{day.date}}</h4>
+        <table v-if="!fourHourly">
+          <tr>
+            <th>Condition:</th>
+            <th>Temp:</th>
+            <th v-if="moreForecast">Chance of rain:</th>
+          </tr>
+          <tr>
+            <td><img :src="day.day.condition.icon"></td>
+            <td>{{day.day.maxtemp_c}} °C</td>
+            <td v-if="moreForecast">{{day.day.daily_chance_of_rain}}%</td>
+          </tr>
+        </table>
+        <div v-for="hour in day.hour" :key="hour">
+          <table v-if="fourHourly" v-show="multipleOf4(hour.time.split(' ')[1])">
+            <tr>
+              <th>Time:</th>
+              <th>Condition:</th>
+              <th>Temp:</th>
+              <th v-if="moreForecast">Chance of rain:</th>
+            </tr>
+            <tr>
+              <td>{{hour.time.split(' ')[1]}}</td>
+              <td><img :src="hour.condition.icon"></td>
+              <td>{{hour.temp_c}} °C</td>
+              <td v-if="moreForecast">{{hour.chance_of_rain}}%</td>
+            </tr>
+          </table>
+          <br v-if="fourHourly" v-show="multipleOf4(hour.time.split(' ')[1])">
+        </div>
+      </div>
     </div>
   </div>
-
-  <!-- forecasted weather data -->
-  <div class="forecast" v-if="forecastedData">
-    <h3>Forecasted Weather:</h3>
-    <h4>{{forecastedData.location.name}}</h4>
-    <div v-for="day in forecastedData.forecast.forecastday">
-      <table>
-        <tr>
-          <th>Date:</th>
-          <th>Condition:</th>
-          <th>Temp:</th>
-          <th>Chance of rain:</th>
-        </tr>
-        <tr>
-          <td>{{day.date}}</td>
-          <td><img :src="day.day.condition.icon"></td>
-          <td>{{day.day.maxtemp_c}} °C</td>
-          <td>{{day.day.daily_chance_of_rain}}%</td>
-        </tr>
-      </table>
-    </div>
-  </div>
-
+</div>
 </template>
 
 <script lang="ts">
@@ -124,6 +148,8 @@ export default({
     const incrementBool: Ref<boolean> = ref(true);
     const decrementBool: Ref<boolean> = ref(false);
     const moreCurrent: Ref<boolean> = ref(false);
+    const moreForecast: Ref<boolean> = ref(false);
+    const fourHourly: Ref<boolean> = ref(false);
 
     //DOM messages
     const inputError: Ref<string> = ref('');
@@ -131,6 +157,7 @@ export default({
     //strings
     const temperature: Ref<string> = ref('c');
     const wind: Ref<string> = ref('m');
+    const precip: Ref<string> = ref('in');
 
     //computed
     const currentData = computed<Object>(() => store.getters.getCWData);
@@ -160,12 +187,12 @@ export default({
 
     //increment and decrement days functions
     function increment(num: number){
-      if (num <= 9) {
+      if (num <= 2) {
         daysInput.value++;
         decrementBool.value = true;
       } else {
         incrementBool.value = false;
-        inputError.value = 'Number of days cannot be more than 10.'
+        inputError.value = 'Number of days cannot be more than 3.'
       }
     }
 
@@ -183,11 +210,41 @@ export default({
       moreCurrent.value = !moreCurrent.value
     }
 
+    function toggleMoreForecast() {
+      moreForecast.value = !moreForecast.value
+    }
+
     function toggle(m: string, v: string) {
       if (m === 'temp') {
         temperature.value = v
       } else if (m === 'wind') {
         wind.value = v
+      } else if (m === 'precip') {
+        precip.value = v
+      }
+    }
+
+    function toggle4Hourly(date: string) {
+      fourHourly.value = !fourHourly.value
+    }
+
+    function multipleOf4(hour: string){
+      if (hour === '00:00'){
+        return true
+      } else if (hour === '04:00'){
+        return true
+      } else if (hour === '08:00'){
+        return true
+      } else if (hour === '12:00'){
+        return true
+      } else if (hour === '16:00'){
+        return true
+      } else if (hour === '20:00'){
+        return true
+      } else if (hour === '23:00'){
+        return true
+      } else {
+        return false
       }
     }
     
@@ -210,7 +267,13 @@ export default({
       toggleMoreCurrent,
       temperature,
       toggle,
-      wind
+      wind,
+      precip,
+      toggleMoreForecast,
+      moreForecast,
+      toggle4Hourly,
+      fourHourly,
+      multipleOf4
     }
   }
 })
@@ -219,6 +282,26 @@ export default({
 
 
 <style>
+.wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+.controls{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+  background-color: lightblue;
+  border-radius: 10px;
+  padding: 30px;
+  margin: 0 auto;
+  width: fit-content;
+}
+
 .user-input{
   display: flex;
   flex-wrap: wrap;
@@ -266,29 +349,56 @@ input-buttons{
   padding-left:8px;
   padding-right:8px;
   border-radius: 5px;
+  text-align: center;
+}
+
+.weatherdata {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+  margin: 30px;
 }
 
 .current{
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  background-color: lightgrey;
+  border-radius: 10px;
+  padding: 30px;
+}
+
+.forecast{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  margin-top: 30px;
+  background-color: lightgrey;
+  border-radius: 10px;
+  padding: 30px;
 }
 
 table, th, td {
   border:1px solid black;
-  width: fit-content;
 }
 
 th, td {
-  padding: 15px;
+  padding: 20px;
   text-align: center;
+  min-width: 50px;
 }
 
 .button {
   width: fit-content;
   padding: 5px;
-  margin-top: 15px;
-  margin-bottom: 15px;
+  margin: 15px;
 }
 
 .toggle-button {
@@ -299,6 +409,21 @@ th, td {
   padding-right:8px;
   margin: 10px;
   border-radius: 5px;
+}
+
+table {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  width: 50%;
+  margin: 0 auto;
+}
+
+.forecast-controls{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+  align-content: center;
 }
 
 </style>
