@@ -98,13 +98,35 @@
         <table v-if="!fourHourly">
           <tr>
             <th>Condition:</th>
-            <th>Temp:</th>
-            <th v-if="moreForecast">Chance of rain:</th>
+            <th>Maximum Temperature:</th>
+            <th>Chance Of Rain:</th>
+            <th v-if="moreForecast">Chance of Snow:</th>
+            <th v-if="moreForecast">Average Temperature:</th>
+            <th v-if="moreForecast">Minimum Temperature:</th>
+            <th v-if="moreForecast">Average Humidity:</th>
+            <th v-if="moreForecast">Maximum Wind Speed:</th>
+            <th v-if="moreForecast">Total Precipitation:</th>
+            <th v-if="moreForecast">Average Visibility:</th>
+            <th v-if="moreForecast">UV:</th>
           </tr>
           <tr>
             <td><img :src="day.day.condition.icon"></td>
-            <td>{{day.day.maxtemp_c}} °C</td>
-            <td v-if="moreForecast">{{day.day.daily_chance_of_rain}}%</td>
+            <td v-show="temperature === 'c'">{{day.day.maxtemp_c}} °C</td>
+            <td v-show="temperature === 'f'">{{day.day.maxtemp_f}} °F</td>
+            <td>{{day.day.daily_chance_of_rain}}%</td>
+            <td v-if="moreForecast">{{day.day.daily_chance_of_snow}}%</td>
+            <td v-if="moreForecast" v-show="temperature === 'c'">{{day.day.avgtemp_c}} °C</td>
+            <td v-if="moreForecast" v-show="temperature === 'f'">{{day.day.avgtemp_f}} °F</td>
+            <td v-if="moreForecast" v-show="temperature === 'c'">{{day.day.mintemp_c}} °C</td>
+            <td v-if="moreForecast" v-show="temperature === 'f'">{{day.day.mintemp_f}} °F</td>
+            <td v-if="moreForecast">{{day.day.avghumidity}}%</td>
+            <td v-if="moreForecast" v-show="wind === 'k'">{{day.day.maxwind_kph}} KPH</td>
+            <td v-if="moreForecast" v-show="wind === 'm'">{{day.day.maxwind_mph}} MPH</td>
+            <td v-if="moreForecast" v-show="precip === 'mm'">{{day.day.totalprecip_mm}} mm</td>
+            <td v-if="moreForecast" v-show="precip === 'in'">{{day.day.totalprecip_in}} inches</td>
+            <td v-if="moreForecast" v-show="wind === 'k'">{{day.day.avgvis_km}} km</td>
+            <td v-if="moreForecast" v-show="wind === 'm'">{{day.day.avgvis_miles}} miles</td>
+            <td v-if="moreForecast">{{day.day.uv}}</td>
           </tr>
         </table>
         <div v-for="hour in day.hour" :key="hour">
@@ -112,14 +134,36 @@
             <tr>
               <th>Time:</th>
               <th>Condition:</th>
-              <th>Temp:</th>
-              <th v-if="moreForecast">Chance of rain:</th>
+              <th>Temperature:</th>
+              <th>Chance Of Rain:</th>
+              <th v-if="moreForecast">Chance Of Snow:</th>
+              <th v-if="moreForecast">Cloud Coverage:</th>
+              <th v-if="moreForecast">Feels Like:</th>
+              <th v-if="moreForecast">Humidity:</th>
+              <th v-if="moreForecast">Precipitation:</th>
+              <th v-if="moreForecast">UV:</th>
+              <th v-if="moreForecast">Visibility:</th>
+              <th v-if="moreForecast">Wind Speed:</th>
+              <th v-if="moreForecast">Wind Direction:</th>
             </tr>
             <tr>
               <td>{{hour.time.split(' ')[1]}}</td>
               <td><img :src="hour.condition.icon"></td>
               <td>{{hour.temp_c}} °C</td>
-              <td v-if="moreForecast">{{hour.chance_of_rain}}%</td>
+              <td>{{hour.chance_of_rain}}%</td>
+              <td v-if="moreForecast">{{hour.chance_of_snow}}%</td>
+              <td v-if="moreForecast">{{hour.cloud}}%</td>
+              <td v-if="moreForecast" v-show="temperature === 'c'">{{hour.feelslike_c}} °C</td>
+              <td v-if="moreForecast" v-show="temperature === 'f'">{{hour.feelslike_f}} °F</td>
+              <td v-if="moreForecast">{{hour.humidity}}%</td>
+              <td v-if="moreForecast" v-show="precip === 'in'">{{hour.precip_in}} inches</td>
+              <td v-if="moreForecast" v-show="precip === 'mm'">{{hour.precip_mm}} mm</td>
+              <td v-if="moreForecast">{{hour.uv}}</td>
+              <td v-if="moreForecast" v-show="wind === 'k'">{{hour.vis_km}} km</td>
+              <td v-if="moreForecast" v-show="wind === 'm'">{{hour.vis_miles}} miles</td>
+              <td v-if="moreForecast" v-show="wind === 'k'">{{hour.wind_kph}} KPH</td>
+              <td v-if="moreForecast" v-show="wind === 'm'">{{hour.wind_mph}} MPH</td>
+              <td v-if="moreForecast">{{hour.wind_dir}}</td>
             </tr>
           </table>
           <br v-if="fourHourly" v-show="multipleOf4(hour.time.split(' ')[1])">
@@ -176,6 +220,7 @@ export default({
 
     //get functions
     function getCurrent(location: string) {
+
       store.dispatch('getCurrentData', location );
       locationInput.value = ''
     }
