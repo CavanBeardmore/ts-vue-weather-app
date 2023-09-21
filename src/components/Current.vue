@@ -2,6 +2,11 @@
     <div class="current" v-if="currentData">
         <h2>Current Weather:</h2>
         <h3>{{currentData.location.name}}</h3>
+        <div class="data-controls">
+            <button @click="toggleMoreCurrent" class="button">Show More Information</button>
+            <button @click="addLocation(currentData.location.name)" class="button">Add To Locations</button>
+            <button @click="clearCurrent" class="button">Clear</button>
+        </div>
         <table>
         <tr>
             <th>Condition:</th>
@@ -35,8 +40,6 @@
             <td v-if="moreCurrent" v-show="wind === 'k'">{{currentData.current.vis_km}} KM</td>
         </tr>
         </table>
-        <button @click="toggleMoreCurrent" class="button">Show More Information</button>
-        <button @click="clearCurrent" class="button">Clear</button>
     </div>
 </template>
 
@@ -45,12 +48,16 @@ import store from '@/store'
 import { useStore } from 'vuex'
 import { ref, computed } from 'vue'
 import type { Ref } from 'vue';
+import { Location } from '../classes/locationClass'
 
 export default {
  setup() {
 
     //use store 
     const store = useStore();   
+
+    //error
+    const locationError: Ref<string> = ref('');
 
     //boolean
     const moreCurrent = computed<Object>(() => store.getters.getMoreC);
@@ -82,6 +89,29 @@ export default {
         store.commit('clearCurrent')
     }
 
+    function addLocation(name: string) {
+      const array = store.getters.getLocations
+
+      const filtered = array.filter((location: Location) => location.name === name)
+
+      console.log(name, filtered)
+
+      if (filtered.length !== 0) {
+        locationError.value = 'This location already exists'
+      } else {
+        store.commit('addLocation', new Location(
+            name,
+            'https://api.weatherapi.com/v1/current.json?key=930a60d791f84d648ee164103231807&q=',
+            '&aqi=no',
+            'https://api.weatherapi.com/v1/forecast.json?key=930a60d791f84d648ee164103231807&q=',
+            '&days=',
+            '&aqi=no&alerts=no'
+            ))
+        locationError.value = ''
+      }
+      console.log(store.getters.getLocations)
+    }
+
     return {
         moreCurrent,
         toggleMoreCurrent,
@@ -90,7 +120,9 @@ export default {
         wind,
         precip,
         formattedTime,
-        clearCurrent
+        clearCurrent,
+        addLocation,
+        locationError
     }
  }
 }

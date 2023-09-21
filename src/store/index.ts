@@ -11,7 +11,8 @@ export default createStore({
     wind: 'm',
     precip: 'in',
     moreCurrent: false,
-    moreForecast: false
+    moreForecast: false,
+    locations: []
   },
   getters: {
     getCWData(state) {
@@ -37,6 +38,10 @@ export default createStore({
     },
     getMoreF(state) {
       return state.moreForecast
+    },
+    getLocations(state) {
+      console.log(state.locations)
+      return state.locations
     }
   },
   mutations: {
@@ -69,6 +74,10 @@ export default createStore({
     },
     clearForecast(state) {
       state.forecastedData = null
+    },
+    addLocation(state, location) {
+      console.log(location)
+      state.locations = state.locations.concat(location)
     }
   },
   actions: {

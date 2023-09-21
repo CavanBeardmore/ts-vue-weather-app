@@ -21,13 +21,13 @@
           @click="getCurrent(locationInput)" 
           :disabled="!locationInput" 
           class="i-button"
-        > Get current weather </button>
+        > Get Current Weather </button>
         <button 
           type="button" 
           @click="getForecast(locationInput, daysInput)" 
           :disabled="!locationInput" 
           class="i-button"
-          > Get forecasted weather </button>
+          > Get Forecasted Weather </button>
       </div>
     </form>
 
@@ -46,12 +46,21 @@
   </div>
 
   <div class="weatherdata">
+  <!-- -->
+  <div v-show="!currentData && !forecastedData" v-if="hideMessage">
+    <p>Enter a location name into the input field.</p>
+    <p>If you would like to get the current weather data click the <strong> Get Current Weather </strong> button.</p>
+    <p>If you would like to get forecasted data. </p>
+    <p>Then use the <strong> + </strong> and <strong> - </strong> buttons to select the forecast length. </p>
+    <p>Then click the <strong> Get Forecasted Weather </strong> button.</p>
+    <button class="button" @click="toggleMessage">Hide Message</button>
+  </div>
   <!-- current weather data -->
   <Current />
   <!-- forecasted weather data -->
   <Forecast />
   </div>
-  
+
 </div>
 </template>
 
@@ -80,6 +89,7 @@ export default({
     const decrementBool: Ref<boolean> = ref(false);
     const moreCurrent = computed<Object>(() => store.getters.getMoreC);
     const moreForecast = computed<Object>(() => store.getters.getMoreF);
+    const hideMessage: Ref<boolean> = ref(true);
 
     //data
     const currentData = computed<Object>(() => store.getters.getCWData);
@@ -107,7 +117,6 @@ export default({
 
     //get functions
     function getCurrent(location: string) {
-
       store.dispatch('getCurrentData', location );
       locationInput.value = ''
     }
@@ -148,6 +157,9 @@ export default({
       }
     }
 
+    function toggleMessage() {
+      hideMessage.value = !hideMessage.value
+    }
 
     
     return {
@@ -169,7 +181,9 @@ export default({
       currentData,
       forecastedData,
       moreCurrent,
-      moreForecast
+      moreForecast,
+      hideMessage,
+      toggleMessage
     }
   }
 })
@@ -196,6 +210,9 @@ export default({
   padding: 30px;
   margin: 0 auto;
   width: fit-content;
+  padding: 30px;
+  border-style: ridge;
+  box-shadow: 4px 4px #AEABAB;
 }
 
 .user-input{
@@ -264,9 +281,11 @@ input-buttons{
   flex-direction: column;
   justify-content: center;
   align-content: center;
-  background-color: lightgrey;
+  background-color: #F3F6F5;
   border-radius: 10px;
   padding: 30px;
+  border-style: ridge;
+  box-shadow: 4px 4px #AEABAB;
 }
 
 .forecast{
@@ -276,9 +295,11 @@ input-buttons{
   justify-content: center;
   align-content: center;
   margin-top: 30px;
-  background-color: lightgrey;
+  background-color: #F3F6F5;
   border-radius: 10px;
   padding: 30px;
+  border-style: ridge;
+  box-shadow: 4px 4px #AEABAB;
 }
 
 table, th, td {
@@ -314,12 +335,20 @@ table {
   margin: 0 auto;
 }
 
-.forecast-controls{
+.data-controls{
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   justify-content: center;
   align-content: center;
+}
+
+th {
+  background-color: #C0C8C7;
+}
+
+td {
+  background-color: #ECECEC;
 }
 
 </style>

@@ -2,9 +2,10 @@
       <div class="forecast" v-if="forecastedData">
       <h2>Forecasted Weather:</h2>
       <h3>{{forecastedData.location.name}}</h3>
-      <div class="forecast-controls">
+      <div class="data-controls">
         <button @click="toggleMoreForecast" class="button">Show More Information</button> 
         <button @click="toggle4Hourly" class="button">Show Four Hourly Data</button>
+        <button @click="addLocation(forecastedData.location.name)" class="button">Add To Locations</button>
         <button @click="clearForecast" class="button">Clear</button>
       </div>
       <div v-for="day in forecastedData.forecast.forecastday" :key="day" class="forecast-day">
@@ -91,11 +92,15 @@ import store from '@/store';
 import { useStore } from 'vuex';
 import { computed, ref } from 'vue';
 import type { Ref } from 'vue';
+import { Location } from '../classes/locationClass'
 
 export default {
   setup() {
 
     const store = useStore()
+
+    //error
+    const locationError: Ref<string> = ref('');
 
     //data
     const forecastedData = computed<Object>(() => store.getters.getFWData);
@@ -145,6 +150,29 @@ export default {
         store.commit('clearForecast')
     }
 
+    function addLocation(name: string) {
+      const array = store.getters.getLocations
+
+      const filtered = array.filter((location: Location) => location.name === name)
+
+      console.log(name, filtered)
+
+      if (filtered.length !== 0) {
+        locationError.value = 'This location already exists'
+      } else {
+        store.commit('addLocation', new Location(
+            name,
+            'https://api.weatherapi.com/v1/current.json?key=930a60d791f84d648ee164103231807&q=',
+            '&aqi=no',
+            'https://api.weatherapi.com/v1/forecast.json?key=930a60d791f84d648ee164103231807&q=',
+            '&days=',
+            '&aqi=no&alerts=no'
+            ))
+        locationError.value = ''
+      }
+      console.log(store.getters.getLocations)
+    }
+
     return {
       toggle4Hourly,
       multipleOf4,
@@ -155,7 +183,9 @@ export default {
       fourHourly,
       moreForecast,
       toggleMoreForecast,
-      clearForecast
+      clearForecast,
+      addLocation,
+      locationError
     }
   }
 }
