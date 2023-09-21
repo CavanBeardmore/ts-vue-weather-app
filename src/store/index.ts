@@ -6,7 +6,12 @@ export default createStore({
   state: {
     currentData: null,
     forecastedData: null,
-    requestError: null
+    requestError: null,
+    temp: 'c',
+    wind: 'm',
+    precip: 'in',
+    moreCurrent: false,
+    moreForecast: false
   },
   getters: {
     getCWData(state) {
@@ -17,20 +22,53 @@ export default createStore({
     },
     getError(state) {
       return state.requestError
+    },
+    getTemp(state) {
+      return state.temp
+    },
+    getWind(state) {
+      return state.wind
+    },
+    getPrecip(state) {
+      return state.precip
+    },
+    getMoreC(state) {
+      return state.moreCurrent
+    },
+    getMoreF(state) {
+      return state.moreForecast
     }
   },
   mutations: {
     updateCurrent(state, data) {
       state.currentData = data
-      console.log(data)
     },
     updateError(state, error) {
       state.requestError = error
-      console.log(error)
     },
     updateForecasted(state, data) {
       state.forecastedData = data
-      console.log(data)
+    },
+    updateTemp(state, v: string) {
+      state.temp = v
+    },
+    updateWind(state, v: string) {
+      state.wind = v
+    },
+    updatePrecip(state, v: string) {
+      state.precip = v
+    },
+    updateMoreC(state) {
+      state.moreCurrent = !state.moreCurrent
+    },
+    updateMoreF(state) {
+      state.moreForecast = !state.moreForecast
+    },
+    clearCurrent(state) {
+      state.currentData = null
+    },
+    clearForecast(state) {
+      state.forecastedData = null
     }
   },
   actions: {
