@@ -3,11 +3,12 @@ import { hasURLFormatter } from "@/interfaces/format";
 export class Location implements hasURLFormatter{
     constructor(
         public name: string,
-        private currentURLOne: string,
-        private currentURLTwo: string,
-        private forecastURLOne: string,
-        private forecastURLTwo: string,
-        private forecastURLThree: string
+        public currentURLOne: string,
+        public currentURLTwo: string,
+        public forecastURLOne: string,
+        public forecastURLTwo: string,
+        public forecastURLThree: string,
+        public currentData: object = {}
     ){}
 
     formatCurrent(a: string, b: string, c: string) {
@@ -17,5 +18,9 @@ export class Location implements hasURLFormatter{
     formatForecast(a: string, b: string, c: string, d: number, e: string) {
         return a + b + c + d + e
     };
+
+    addData(data: object) {
+        this.currentData = data
+    }
 
 }

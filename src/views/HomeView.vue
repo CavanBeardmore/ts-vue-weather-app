@@ -192,6 +192,7 @@ export default({
 
 
 <style>
+
 .wrapper {
   display: flex;
   flex-wrap: wrap;

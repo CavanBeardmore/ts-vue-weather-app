@@ -40,7 +40,6 @@ export default createStore({
       return state.moreForecast
     },
     getLocations(state) {
-      console.log(state.locations)
       return state.locations
     }
   },
@@ -76,7 +75,6 @@ export default createStore({
       state.forecastedData = null
     },
     addLocation(state, location) {
-      console.log(location)
       state.locations = state.locations.concat(location)
     }
   },
@@ -100,8 +98,6 @@ export default createStore({
 
       const location: string  = payload.location
       const days: number = payload.days
-
-      console.log(location, days)
 
       getData(formatForecast(
         'https://api.weatherapi.com/v1/forecast.json?key=930a60d791f84d648ee164103231807&q=',

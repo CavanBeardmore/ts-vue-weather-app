@@ -4,9 +4,11 @@
         <h3>{{currentData.location.name}}</h3>
         <div class="data-controls">
             <button @click="toggleMoreCurrent" class="button">Show More Information</button>
-            <button @click="addLocation(currentData.location.name)" class="button">Add To Locations</button>
+            <button @click="addLocation(currentData.location.name)" class="button" :disabled="locationError.length">Add To Locations</button>
             <button @click="clearCurrent" class="button">Clear</button>
         </div>
+        <p v-if="locationError" style="color: darkred"><strong>{{locationError}}</strong></p>
+        <p v-if="locationMessage" style="color: darkgreen"><strong>{{locationMessage}}</strong></p>
         <table>
         <tr>
             <th>Condition:</th>
@@ -56,8 +58,9 @@ export default {
     //use store 
     const store = useStore();   
 
-    //error
+    //error & messages
     const locationError: Ref<string> = ref('');
+    const locationMessage: Ref<string> = ref('');
 
     //boolean
     const moreCurrent = computed<Object>(() => store.getters.getMoreC);
@@ -87,6 +90,9 @@ export default {
 
     function clearCurrent() {
         store.commit('clearCurrent')
+        if (store.getters.getMoreC === true) {
+          store.commit('updateMoreC')
+        }
     }
 
     function addLocation(name: string) {
@@ -94,10 +100,9 @@ export default {
 
       const filtered = array.filter((location: Location) => location.name === name)
 
-      console.log(name, filtered)
-
       if (filtered.length !== 0) {
         locationError.value = 'This location already exists'
+        locationMessage.value = ''
       } else {
         store.commit('addLocation', new Location(
             name,
@@ -108,8 +113,8 @@ export default {
             '&aqi=no&alerts=no'
             ))
         locationError.value = ''
+        locationMessage.value = 'Location added!'
       }
-      console.log(store.getters.getLocations)
     }
 
     return {
@@ -122,7 +127,8 @@ export default {
         formattedTime,
         clearCurrent,
         addLocation,
-        locationError
+        locationError,
+        locationMessage
     }
  }
 }
