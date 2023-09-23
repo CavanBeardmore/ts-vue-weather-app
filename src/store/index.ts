@@ -12,7 +12,9 @@ export default createStore({
     precip: 'in',
     moreCurrent: false,
     moreForecast: false,
-    locations: []
+    locations: [],
+    locationError: '',
+    locationMessage: ''
   },
   getters: {
     getCWData(state) {
@@ -41,6 +43,12 @@ export default createStore({
     },
     getLocations(state) {
       return state.locations
+    },
+    getLocError(state) {
+      return state.locationError
+    },
+    getLocMessage(state) {
+      return state.locationMessage
     }
   },
   mutations: {
@@ -76,6 +84,12 @@ export default createStore({
     },
     addLocation(state, location) {
       state.locations = state.locations.concat(location)
+    },
+    updateLocError(state, error) {
+      state.locationError = error
+    },
+    updateLocMessage(state, message) {
+      state.locationMessage = message
     }
   },
   actions: {

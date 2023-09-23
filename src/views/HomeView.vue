@@ -119,11 +119,17 @@ export default({
     function getCurrent(location: string) {
       store.dispatch('getCurrentData', location );
       locationInput.value = ''
+      store.commit('updateLocError', '')
+      store.commit('updateLocMessage', '')
+      store.commit('clearForecast')
     }
 
     function getForecast(location: string, days: number) {
       store.dispatch('getForecastedData', { location, days });
       locationInput.value = ''
+      store.commit('updateLocError', '')
+      store.commit('updateLocMessage', '')
+      store.commit('clearCurrent')
     }
 
     //increment and decrement days functions
@@ -197,6 +203,7 @@ export default({
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
+  margin-top: 25px;
 }
 
 .controls{

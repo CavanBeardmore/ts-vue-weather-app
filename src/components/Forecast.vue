@@ -1,5 +1,5 @@
 <template>
-  <div class="forecast" v-if="forecastedData">
+  <div class="forecast" v-if="forecastedData && !currentData">
     <h2>Forecasted Weather:</h2>
     <h3>{{forecastedData.location.name}}</h3>
     <div class="data-controls">
@@ -123,11 +123,12 @@ export default {
     const store = useStore()
 
     //error & messages
-    const locationError: Ref<string> = ref('');
-    const locationMessage: Ref<string> = ref('');
+    const locationMessage = computed<string>(() => store.getters.getLocMessage);
+    const locationError = computed<string>(() => store.getters.getLocError);
 
     //data
     const forecastedData = computed<Object>(() => store.getters.getFWData);
+    const currentData = computed<Object>(() => store.getters.getCWData);
 
     //measurement toggle
     const temperature = computed<string>(() => store.getters.getTemp);
@@ -190,8 +191,8 @@ export default {
       const filtered = array.filter((location: Location) => location.name === name)
 
       if (filtered.length !== 0) {
-        locationError.value = 'This location already exists'
-        locationMessage.value = ''
+        store.commit('updateLocError', 'This Location Already Exists')
+        store.commit('updateLocMessage', '')
       } else {
         store.commit('addLocation', new Location(
             name,
@@ -201,8 +202,8 @@ export default {
             '&days=',
             '&aqi=no&alerts=no',
             ));
-        locationMessage.value = 'Location added!'
-        locationError.value = ''
+        store.commit('updateLocError', '')
+        store.commit('updateLocMessage', 'Location Added!')
       }
     }
 
@@ -221,7 +222,8 @@ export default {
       locationError,
       astro,
       toggleAstro,
-      locationMessage
+      locationMessage,
+      currentData
     }
   }
 }

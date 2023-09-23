@@ -1,5 +1,5 @@
 <template>
-    <div class="current" v-if="currentData">
+    <div class="current" v-if="currentData && !forecastedData">
         <h2>Current Weather:</h2>
         <h3>{{currentData.location.name}}</h3>
         <div class="data-controls">
@@ -11,8 +11,8 @@
         <p v-if="locationMessage" style="color: darkgreen"><strong>{{locationMessage}}</strong></p>
         <table>
         <tr>
-            <th>Condition:</th>
             <th>Time:</th>
+            <th>Condition:</th>
             <th>Temp:</th>
             <th v-if="moreCurrent">Wind Speed:</th>
             <th v-if="moreCurrent">Wind Direction:</th>
@@ -24,8 +24,8 @@
             <th v-if="moreCurrent">Visibility:</th>
         </tr>
         <tr>
-            <td><img :src="currentData.current.condition.icon"></td>
             <td>{{formattedTime}}</td>
+            <td><img :src="currentData.current.condition.icon"></td>
             <td v-show="temperature === 'c'">{{currentData.current.temp_c}} °C</td>
             <td v-show="temperature === 'f'">{{currentData.current.temp_f}} °F</td>
             <td v-if="moreCurrent" v-show="wind === 'm'">{{currentData.current.wind_mph}} MPH</td>
@@ -59,14 +59,15 @@ export default {
     const store = useStore();   
 
     //error & messages
-    const locationError: Ref<string> = ref('');
-    const locationMessage: Ref<string> = ref('');
+    const locationMessage = computed<string>(() => store.getters.getLocMessage);
+    const locationError = computed<string>(() => store.getters.getLocError);
 
     //boolean
     const moreCurrent = computed<Object>(() => store.getters.getMoreC);
 
     //data
     const currentData = computed<Object>(() => store.getters.getCWData);
+    const forecastedData = computed<Object>(() => store.getters.getFWData);
 
     //time
     const formattedTime = computed<Object>(() => {
@@ -101,8 +102,8 @@ export default {
       const filtered = array.filter((location: Location) => location.name === name)
 
       if (filtered.length !== 0) {
-        locationError.value = 'This location already exists'
-        locationMessage.value = ''
+        store.commit('updateLocError', 'This Location Already Exists')
+        store.commit('updateLocMessage', '')
       } else {
         store.commit('addLocation', new Location(
             name,
@@ -112,8 +113,8 @@ export default {
             '&days=',
             '&aqi=no&alerts=no'
             ))
-        locationError.value = ''
-        locationMessage.value = 'Location added!'
+        store.commit('updateLocError', '')
+        store.commit('updateLocMessage', 'Location Added!')
       }
     }
 
@@ -128,7 +129,8 @@ export default {
         clearCurrent,
         addLocation,
         locationError,
-        locationMessage
+        locationMessage,
+        forecastedData
     }
  }
 }
