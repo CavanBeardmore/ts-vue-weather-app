@@ -201,6 +201,7 @@ export default {
             'https://api.weatherapi.com/v1/forecast.json?key=930a60d791f84d648ee164103231807&q=',
             '&days=',
             '&aqi=no&alerts=no',
+            false
             ));
         store.commit('updateLocError', '')
         store.commit('updateLocMessage', 'Location Added!')

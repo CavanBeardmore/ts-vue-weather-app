@@ -42,6 +42,7 @@ export default createStore({
       return state.moreForecast
     },
     getLocations(state) {
+      console.log(state.locations)
       return state.locations
     },
     getLocError(state) {
@@ -83,6 +84,8 @@ export default createStore({
       state.forecastedData = null
     },
     addLocation(state, location) {
+      console.log(location)
+      console.log(state.locations)
       state.locations = state.locations.concat(location)
     },
     updateLocError(state, error) {

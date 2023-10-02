@@ -8,7 +8,8 @@ export class Location implements hasURLFormatter{
         public forecastURLOne: string,
         public forecastURLTwo: string,
         public forecastURLThree: string,
-        public currentData: object = {}
+        public moreInfo: boolean = false,
+        public weatherData: object = {},
     ){}
 
     formatCurrent(a: string, b: string, c: string) {
@@ -20,7 +21,11 @@ export class Location implements hasURLFormatter{
     };
 
     addData(data: object) {
-        this.currentData = data
-    }
+        this.weatherData = data
+    };
+
+    toggleMoreInfo() {
+        this.moreInfo = !this.moreInfo
+    };
 
 }
