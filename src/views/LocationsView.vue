@@ -10,8 +10,10 @@
       <button @click="toggle('precip', 'in')" v-show="precip === 'mm' && showingMore" class="toggle-button"> Show in Inches </button>
       <button class="toggle-button" @click="toggle('on')" v-show="!showingAll">Show More Information For All</button>
       <button class="toggle-button" @click="toggle('off')" v-show="showingAll">Hide More Information For All</button>
-      <button class="toggle-button" @click="toggle('four')" v-show="!fourHourly">Show Four Hourly Data</button>
-      <button class="toggle-button" @click="toggle('four')" v-show="fourHourly">Hide Four Hourly Data</button>
+      <button class="toggle-button" @click="toggle('four')" v-show="!fourHourly && showingType === 'forecast'">Show Four Hourly Data</button>
+      <button class="toggle-button" @click="toggle('four')" v-show="fourHourly && showingType === 'forecast'">Hide Four Hourly Data</button>
+      <button class="toggle-button" @click="toggle('astro')" v-show="!showAstro && showingType === 'forecast'">Show Astrological Data</button>
+      <button class="toggle-button" @click="toggle('astro')" v-show="showAstro && showingType === 'forecast'">Hide Astrological Data</button>
     </div>
     <div>
       <div class="location-list" v-for="location in locationsList" :key="location.name">
@@ -111,7 +113,26 @@
                   <td>{{day.astro.moon_illumination}}%</td>
                 </tr>
               </table>
-              <br v-if="astro">
+              <br v-if="showAstro">
+              <table v-if="showAstro">
+                <tr>
+                  <th>Sunrise:</th>
+                  <th>Sunset:</th>
+                  <th>Moonrise:</th>
+                  <th>Moonset:</th>
+                  <th>Moon Phase:</th>
+                  <th>Moon Illumination:</th>
+                </tr>
+                <tr>
+                  <td>{{day.astro.sunrise}}</td>
+                  <td>{{day.astro.sunset}}</td>
+                  <td>{{day.astro.moonrise}}</td>
+                  <td>{{day.astro.moonset}}</td>
+                  <td>{{day.astro.moon_phase}}</td>
+                  <td>{{day.astro.moon_illumination}}%</td>
+                </tr>
+              </table>
+              <br v-if="showAstro">
               <div v-for="hour in day.hour" :key="hour">
                 <table v-if="fourHourly" v-show="multipleOf4(hour.time.split(' ')[1])">
                   <tr>
@@ -149,12 +170,16 @@
                     <td v-if="location.moreInfo">{{hour.wind_dir}}</td>
                   </tr>
                 </table>
-                <!-- <br v-if="fourHourly" v-show="multipleOf4(hour.time.split(' ')[1])"> -->
+                <br v-if="fourHourly" v-show="multipleOf4(hour.time.split(' ')[1])">
               </div>
             </div>
           </div>
         </ul>
       </div>
+    </div>
+    <div class="error">
+      <p v-if="!requestError && locationsList.length === 0">You have not yet added any locations.</p>
+      <p v-if="requestError">{{requestError}}</p>
     </div>
   </div>
 </template>
@@ -178,6 +203,7 @@ export default {
     const showingMore: Ref<boolean> = ref(false);
     const showingAll: Ref<boolean> = ref(false);
     const fourHourly: Ref<boolean> = ref(false);
+    const showAstro: Ref<boolean> = ref(false);
 
     //strings
     const showingType: Ref<string> = ref('current');
@@ -251,7 +277,8 @@ export default {
         }
       } else if (m === 'four') {
         fourHourly.value = !fourHourly.value
-        console.log(fourHourly.value)
+      } else if (m === 'astro') {
+        showAstro.value = !showAstro.value
       }
     }
 
@@ -293,7 +320,8 @@ export default {
       showingType,
       showingAll,
       fourHourly,
-      multipleOf4
+      multipleOf4,
+      showAstro
     }
   }
 }
@@ -339,5 +367,14 @@ export default {
   padding: 10px;
   border-style: ridge;
   box-shadow: 4px 4px #AEABAB;
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+  flex-wrap: wrap;
 }
 </style>

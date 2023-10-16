@@ -137,6 +137,7 @@ export default({
       if (num <= 2) {
         daysInput.value++;
         decrementBool.value = true;
+        inputError.value = '';
       } else {
         incrementBool.value = false;
         inputError.value = 'Number of days cannot be more than 3.'
@@ -145,8 +146,9 @@ export default({
 
     function decrement(num: number){
       if (num >= 2) {
-        daysInput.value--
+        daysInput.value--;
         incrementBool.value = true;
+        inputError.value = '';
       } else {
         decrementBool.value = false;
         inputError.value = 'Number of days cannot be less than 1.'
