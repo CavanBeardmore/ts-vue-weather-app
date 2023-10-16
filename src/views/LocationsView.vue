@@ -23,6 +23,7 @@
           <button class="button" v-show="showingType === 'forecast'" @click="toggle('type', 'current')">Show Current Data</button>
           <button class="button" @click="locationToggleMoreInfo(location)" v-show="!location.moreInfo">Show More Information</button>
           <button class="button" @click="locationToggleMoreInfo(location)" v-show="location.moreInfo">Hide More Information</button>
+          <button class="button" @click="deleteLocation(location)">Delete Location</button>
           <p v-if="requestError" style="color: red">{{requestError}}</p>
           <table v-if="showingType === 'current'">
             <tr>
@@ -307,6 +308,11 @@ export default {
       }
     }
 
+    function deleteLocation(location: Location) {
+      const index = locationsList.value.indexOf(location);
+      store.dispatch('removeLocation', {location, index});
+    }
+
     return {
       locationsList,
       requestError,
@@ -321,7 +327,8 @@ export default {
       showingAll,
       fourHourly,
       multipleOf4,
-      showAstro
+      showAstro,
+      deleteLocation
     }
   }
 }

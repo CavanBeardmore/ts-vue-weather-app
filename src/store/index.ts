@@ -1,6 +1,7 @@
 import { createStore } from 'vuex'
 import { formatCurrent, formatForecast } from '@/functions/formatter'
 import { getData } from '@/functions/async'
+import { Location } from '@/classes/locationClass'
 
 export default createStore({
   state: {
@@ -91,7 +92,11 @@ export default createStore({
     },
     updateLocMessage(state, message) {
       state.locationMessage = message
+    },
+    deleteLocation(state, locations) {
+      state.locations = locations
     }
+
   },
   actions: {
     getCurrentData({ commit }, payload) {
@@ -125,6 +130,19 @@ export default createStore({
       }).catch(error => {
         commit('updateError', error);
       })
+
+    },
+    removeLocation({commit}, payload) {
+
+      const location: Location = payload.location
+
+      const index: number = payload.index
+
+      let locations = this.state.locations
+
+      locations.splice(index, 1);
+
+      commit('deleteLocation', locations);
 
     }
   },
