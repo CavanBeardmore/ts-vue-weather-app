@@ -134,8 +134,6 @@ export default createStore({
     },
     removeLocation({commit}, payload) {
 
-      const location: Location = payload.location
-
       const index: number = payload.index
 
       let locations = this.state.locations

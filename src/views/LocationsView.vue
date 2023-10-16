@@ -310,7 +310,7 @@ export default {
 
     function deleteLocation(location: Location) {
       const index = locationsList.value.indexOf(location);
-      store.dispatch('removeLocation', {location, index});
+      store.dispatch('removeLocation', index);
     }
 
     return {
